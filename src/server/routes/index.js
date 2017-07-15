@@ -11,7 +11,7 @@ router.use(function(req, res, next) {
 
 router.post('/new', function (req, res, next) {
   bcrypt.hash(req.body.password, 11, function (err, hash) {
-    queries.newUser(req.body.emailAddress, hash, req.body.coach, function (err, result) {
+    queries.newUser(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.coach, function (err, result) {
       if (err) {
         console.log(err);
       } else {

@@ -1,8 +1,10 @@
 const knex = require('./connection');
 
-exports.newUser = function(emailAddress, password, coach, callback) {
+exports.newUser = function(firstName, lastName, emailAddress, password, coach, callback) {
   knex('users')
   .insert({
+    firstName: firstName,
+    lastName: lastName,
     emailAddress: emailAddress,
     password: password,
     coach: coach
