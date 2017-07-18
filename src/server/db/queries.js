@@ -25,3 +25,31 @@ exports.getUser = function(tableName, emailAddress, callback) {
     callback(err);
   })
 }
+
+exports.newTeam = function(teamName, sport, callback) {
+  knex('teams')
+  .returning('id')
+  .insert({
+    teamName: teamName,
+    sport: sport
+  })
+  .then(result => {
+    callback(null, result[0]);
+  }).catch(err => {
+    console.log(err);
+  })
+}
+
+exports.newCoach = function(firstName, lastName, emailAddress, password, teamId, callback) {
+  knex('coaches')
+  .insert({
+    firstName: firstName,
+    lastName: lastName,
+    emailAddress: emailAddress,
+    password: password,
+    teamId: teamId
+  })
+  .then(result => {
+    console.log(result);
+  })
+}

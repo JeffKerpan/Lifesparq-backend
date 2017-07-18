@@ -9,9 +9,23 @@ router.use(function(req, res, next) {
   return next();
 });
 
-router.post('/new', function (req, res, next) {
+router.post('/newUser', function (req, res, next) {
   bcrypt.hash(req.body.password, 11, function (err, hash) {
-    queries.newUser(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.coach, function (err, result) {
+    queries.newUser(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, function (err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json({
+          message: 'success'
+        });
+      }
+    });
+  });
+});
+
+router.post('/newCoach', function (req, res, next) {
+  bcrypt.hash(req.body.password, 11, function (err, hash) {
+    queries.newCoach(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.teamId, function (err, result) {
       if (err) {
         console.log(err);
       } else {
@@ -46,6 +60,20 @@ router.post('/compare', function (req, res, next) {
       });
     }
   });
+})
+
+router.post('/newTeam', function(req, res, next) {
+  console.log('gotcha');
+  queries.newTeam(req.body.teamName, req.body.sport, function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('yup again');
+      res.json({
+        id: result
+      });
+    }
+  })
 })
 
 module.exports = router;
