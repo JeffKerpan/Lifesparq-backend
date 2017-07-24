@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
+const parse = require('csv-parse');
 
 router.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -24,6 +25,7 @@ router.post('/newUser', function (req, res, next) {
 });
 
 router.post('/newCoach', function (req, res, next) {
+  console.log(req.body);
   bcrypt.hash(req.body.password, 11, function (err, hash) {
     queries.newCoach(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.teamId, function (err, result) {
       if (err) {
@@ -35,6 +37,9 @@ router.post('/newCoach', function (req, res, next) {
       }
     });
   });
+  if (req.body.file && req.body.file.length) {
+    processSpreadsheet(req.body.file);
+  }
 });
 
 router.post('/compare', function (req, res, next) {
@@ -63,17 +68,45 @@ router.post('/compare', function (req, res, next) {
 })
 
 router.post('/newTeam', function(req, res, next) {
-  console.log('gotcha');
   queries.newTeam(req.body.teamName, req.body.sport, function (err, result) {
     if (err) {
       console.log(err);
     } else {
-      console.log('yup again');
       res.json({
         id: result
       });
     }
   })
 })
+
+processSpreadsheet = function(file) {
+  console.log('anything');
+  var output = [];
+  var allUsers = [];
+
+  var parser = parse({delimiter: ':'});
+
+  parser.on('readable', function() {
+    while (record = parser.read()) {
+      if (record[0].match(/[a-z]/i)) {
+        record = record.join(',').split(',').filter((word) => {
+          return (word !== '');
+        });
+        output.push(record);
+      }
+    }
+  });
+
+  parser.on('error', function(err) {
+    console.log(err.message);
+  });
+
+  parser.write(file);
+
+  output.forEach((array) => {
+    console.log(array);
+  })
+
+}
 
 module.exports = router;
