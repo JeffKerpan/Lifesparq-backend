@@ -7,21 +7,24 @@ exports.seed = function(knex, Promise) {
           lastName: 'Loblaw',
           emailAddress: 'testing@123.com',
           password: 'stuffandthings',
-          coach: true
+          teamId: knex('teams').select('id').where('teamName', 'Patriots'),
+          profilePicture: 'https://s3.amazonaws.com/lifesparq-profile-pictures/Boulder+Creek.jpg'
         }),
         knex('users').insert({
           firstName: 'Stephen',
           lastName: 'Colbert',
           emailAddress: 'stephen@colbert.com',
-          password: 'lateshow1234',
-          coach: true
+          password: '$2a$11$Q777YWV/2TBEF53DKBq9PO8luk3X2Pboa32SZRYqqJbc87xrP9i2y',
+          teamId: knex('teams').select('id').where('teamName', 'Patriots'),
+          profilePicture: 'https://s3.amazonaws.com/lifesparq-profile-pictures/Boulder+Creek.jpg'
         }),
         knex('users').insert({
           firstName: 'Ashton',
           lastName: 'Kutcher',
           emailAddress: 'ashton@kutcher.com',
           password: '$2a$11$RFO6RQedExqc4VyN.x6GbOnGRXen4ULufZ4zREnLB.DRgFiOrzdMG',
-          coach: false
+          teamId: knex('teams').select('id').where('teamName', 'Patriots'),
+          profilePicture: 'https://s3.amazonaws.com/lifesparq-profile-pictures/galleryimage-1578242971-feb-7-2012-300x225.jpg'
         })
       ]);
     });

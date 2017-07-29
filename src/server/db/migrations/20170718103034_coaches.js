@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
     table.string('emailAddress');
     table.string('password');
     table.integer('teamId').references('id').inTable('teams');
+    table.string('profilePicture').defaultTo('http://via.placeholder.com/250x250');
   })
 };
 

@@ -6,6 +6,7 @@
     "test": "./node_modules/mocha/bin/_mocha"
   },
   "dependencies": {
+    "aws-sdk": "^2.89.0",
     "bcrypt": "^1.0.2",
     "body-parser": "^1.15.2",
     "connect-flash": "^0.1.1",

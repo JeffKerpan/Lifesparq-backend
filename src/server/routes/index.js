@@ -3,6 +3,8 @@ const router = express.Router();
 const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
+const aws = require('aws-sdk');
+const helper = require('../db/helperFunctions.js');
 
 router.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -10,35 +12,39 @@ router.use(function(req, res, next) {
   return next();
 });
 
-router.post('/newUser', function (req, res, next) {
-  bcrypt.hash(req.body.password, 11, function (err, hash) {
-    queries.newUser(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, function (err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json({
-          message: 'success'
-        });
-      }
-    });
-  });
-});
+// router.post('/newUser', function (req, res, next) {
+//   bcrypt.hash(req.body.password, 11, function (err, hash) {
+//     queries.newUser(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, function (err, result) {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         res.json({
+//           message: 'success'
+//         });
+//       }
+//     });
+//   });
+// });
 
-router.post('/newCoach', function (req, res, next) {
-  console.log(req.body);
+router.post('/newuser', function (req, res, next) {
+  responseObject = {};
   bcrypt.hash(req.body.password, 11, function (err, hash) {
-    queries.newCoach(req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.teamId, function (err, result) {
+    queries.newUser(req.body.tableName, req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.teamId, req.body.profilePicture, function (err, result) {
       if (err) {
         console.log(err);
       } else {
-        res.json({
-          message: 'success'
-        });
+        responseObject.message = 'Success';
+        res.send(responseObject);
       }
     });
   });
-  if (req.body.file && req.body.file.length) {
-    processSpreadsheet(req.body.file);
+  if (req.body.file) {
+    if (Array.isArray(req.body.file)) {
+      console.log('if', req.body.file);
+      //run function that does cool shit with the array of team members!
+    } else {
+      helper.processSpreadsheet(req.body.file);
+    }
   }
 });
 
@@ -46,7 +52,7 @@ router.post('/compare', function (req, res, next) {
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
   let responseObject = {};
-  queries.getUser('users', submittedUsername, function (err, result) {
+  queries.getUser('coaches', submittedUsername, function (err, result) {
     if (err) {
       res.json({
         error: true,
@@ -57,6 +63,11 @@ router.post('/compare', function (req, res, next) {
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
           responseObject.success = true;
+          responseObject.firstName = result[0].firstName;
+          responseObject.lastName = result[0].lastName;
+          responseObject.emailAddress = result[0].emailAddress;
+          responseObject.teamName = result[0].teamName;
+          responseObject.profilePicture = result[0].profilePicture;
           res.send(responseObject);
         } else {
           responseObject.success = false;
@@ -79,34 +90,28 @@ router.post('/newTeam', function(req, res, next) {
   })
 })
 
-processSpreadsheet = function(file) {
-  console.log('anything');
-  var output = [];
-  var allUsers = [];
+router.get('/sign-s3', (req, res) => {
+  const s3 = new aws.S3();
+  const fileName = req.query['file-name'];
+  const fileType = req.query['file-type'];
+  const s3Params = {
+    Bucket: process.env.S3_BUCKET,
+    Key: fileName,
+    ContentType: fileType
+  };
 
-  var parser = parse({delimiter: ':'});
-
-  parser.on('readable', function() {
-    while (record = parser.read()) {
-      if (record[0].match(/[a-z]/i)) {
-        record = record.join(',').split(',').filter((word) => {
-          return (word !== '');
-        });
-        output.push(record);
-      }
+  s3.getSignedUrl('putObject', s3Params, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.end();
     }
+    const returnData = {
+      signedRequest: data,
+      url: `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${fileName}`
+    };
+    res.write(JSON.stringify(returnData));
+    res.end();
   });
-
-  parser.on('error', function(err) {
-    console.log(err.message);
-  });
-
-  parser.write(file);
-
-  output.forEach((array) => {
-    console.log(array);
-  })
-
-}
+});
 
 module.exports = router;
