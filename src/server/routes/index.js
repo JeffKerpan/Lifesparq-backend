@@ -52,7 +52,7 @@ router.post('/compare', function (req, res, next) {
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
   let responseObject = {};
-  queries.getUser('coaches', submittedUsername, function (err, result) {
+  queries.getUser(submittedUsername, function (err, result) {
     if (err) {
       res.json({
         error: true,

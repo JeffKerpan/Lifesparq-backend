@@ -16,13 +16,22 @@ const knex = require('./connection');
 //   })
 // }
 
-exports.getUser = function(tableName, emailAddress, callback) {
-  knex(tableName)
+exports.getUser = function(emailAddress, callback) {
+  knex('coaches')
   .select('firstName', 'lastName', 'emailAddress', 'teamName', 'password', 'profilePicture')
-  .join('teams', 'teams.id', '=', `${tableName}.teamId`)
-  .where(`${tableName}.emailAddress`, emailAddress)
+  .join('teams', 'teams.id', '=', `coaches.teamId`)
+  .where(`coaches.emailAddress`, emailAddress)
   .then(result => {
-    callback(null, result);
+    if (!result.length) {
+      knex('users')
+      .select('firstName', 'lastName', 'emailAddress', 'password', 'profilePicture')
+      .where(`users.emailAddress`, emailAddress)
+      .then(result => {
+        callback(null, result);
+      })
+    } else {
+      callback(null, result);
+    }
   }).catch(err => {
     callback(err);
   })
