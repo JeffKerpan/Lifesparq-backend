@@ -4,7 +4,7 @@ exports.seed = function(knex, Promise) {
       return Promise.all([
         knex('superUsers').insert({
           emailAddress: 'mitch@mconnell.com',
-          password: 'fuckyourinsurance'
+          password: '$2a$11$z7eGt5smO/3GBt9s9aSfLeRvrNWeL.acIZ.NRFzKomJFZgx5OAW5a'
         })
       ]);
     });

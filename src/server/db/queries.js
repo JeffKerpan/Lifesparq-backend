@@ -1,20 +1,4 @@
 const knex = require('./connection');
-//
-// exports.newUser = function(firstName, lastName, emailAddress, password, coach, callback) {
-//   knex('users')
-//   .insert({
-//     firstName: firstName,
-//     lastName: lastName,
-//     emailAddress: emailAddress,
-//     password: password,
-//     coach: coach
-//   })
-//   .then(result => {
-//     callback(null, result);
-//   }).catch(err => {
-//     callback(err);
-//   })
-// }
 
 exports.getUser = function(emailAddress, callback) {
   knex('coaches')
@@ -63,5 +47,15 @@ exports.newUser = function(tableName, firstName, lastName, emailAddress, passwor
   })
   .then(result => {
     callback(null, result);
+  })
+}
+
+exports.superUser = function(emailAddress, callback) {
+  knex('superUsers')
+  .where('superUsers.emailAddress', emailAddress)
+  .then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
   })
 }
