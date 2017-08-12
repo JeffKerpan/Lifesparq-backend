@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 exports.processSpreadsheet = function(file) {
   var output = [];
   var allUsers = [];
@@ -25,4 +27,9 @@ exports.processSpreadsheet = function(file) {
     console.log(array);
   })
 
+}
+
+exports.generateToken = function(emailAddress, password) {
+  var myToken = jwt.sign({emailAddress: emailAddress, password: password}, process.env.JWT_KEY);
+  return myToken;
 }

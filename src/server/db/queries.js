@@ -51,8 +51,8 @@ exports.newUser = function(tableName, firstName, lastName, emailAddress, passwor
 }
 
 exports.superUser = function(emailAddress, callback) {
-  knex('superUsers')
-  .where('superUsers.emailAddress', emailAddress)
+  knex('super_users')
+  .where('super_users.emailAddress', emailAddress)
   .then(result => {
     callback(null, result);
   }).catch(err => {
