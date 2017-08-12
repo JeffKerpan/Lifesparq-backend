@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
 const helper = require('../db/helperFunctions.js');
+const expressJwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
 
 router.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -13,6 +15,7 @@ router.use(function(req, res, next) {
 });
 
 router.post('/compare', function (req, res, next) {
+  console.log('anything at all');
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
   let responseObject = {};
@@ -26,8 +29,8 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          responseObject.success = true;
-          res.send(responseObject);
+          var myToken = helper.generateToken(submittedUsername, submittedPassword);
+          res.status(200).send(myToken);
         } else {
           responseObject.success = false;
           res.send(responseObject);
@@ -38,7 +41,6 @@ router.post('/compare', function (req, res, next) {
 })
 
 router.get('/sign-s3', (req, res) => {
-  console.log('sign s3');
   const s3 = new aws.S3();
   const fileName = req.query['file-name'];
   const fileType = req.query['file-type'];
@@ -63,8 +65,9 @@ router.get('/sign-s3', (req, res) => {
 });
 
 router.post('/password', (req, res) => {
+  console.log(req.body);
   bcrypt.hash(req.body.password, 11, function (err, hash) {
-    console.log(hash);
+    console.log('hash', hash);
   })
 });
 

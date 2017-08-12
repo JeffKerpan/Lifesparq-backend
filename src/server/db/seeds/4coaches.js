@@ -6,7 +6,7 @@ exports.seed = function(knex, Promise) {
           firstName: 'Rex',
           lastName: 'Ryan',
           emailAddress: 'jkigotfired@nfl.com',
-          password: '$2a$11$K77.359BVdGIuO0k5Ujz4O82qQ3Ubvh6xCrmcnJeL9CsAA5DHxOe.',
+          password: '$2a$11$tOR1m08qd9NjMx4TJefuM.ciFgTIG7MsavAsZ2Pb67pI.7Q/5dIou',
           teamId: knex('teams').select('id').where('teamName', 'Bills')
         })
       ]);

@@ -5,12 +5,18 @@ const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
 const helper = require('../db/helperFunctions.js');
+const expressJwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
 
 router.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   return next();
 });
+
+router.use(bodyParser.urlencoded());
+router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', 'newTeam', '/sign-s3', '/super/compare']}));
 
 router.post('/newuser', function (req, res, next) {
   responseObject = {};
@@ -19,8 +25,8 @@ router.post('/newuser', function (req, res, next) {
       if (err) {
         console.log(err);
       } else {
-        responseObject.message = 'Success';
-        res.send(responseObject);
+        var myToken = helper.generateToken(req.body.emailAddress, req.body.password);
+        res.status(200).send(myToken);
       }
     });
   });
@@ -48,13 +54,8 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          responseObject.success = true;
-          responseObject.firstName = result[0].firstName;
-          responseObject.lastName = result[0].lastName;
-          responseObject.emailAddress = result[0].emailAddress;
-          responseObject.teamName = result[0].teamName;
-          responseObject.profilePicture = result[0].profilePicture;
-          res.send(responseObject);
+          var myToken = helper.generateToken(submittedUsername, submittedPassword);
+          res.status(200).json(myToken);
         } else {
           responseObject.success = false;
           res.send(responseObject);
@@ -72,6 +73,21 @@ router.post('/newTeam', function(req, res, next) {
       res.json({
         id: result
       });
+    }
+  })
+})
+
+router.get('/userInfo', function (req, res, next) {
+  queries.getUser(req.body.emailAddress, function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.status(200).json({
+        firstName: result.firstName,
+        lastName: result.lastName,
+        emailAddress: result.emailAddress,
+        profilePicture: result.profilePicture
+      })
     }
   })
 })
