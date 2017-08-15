@@ -4,7 +4,7 @@ const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
-const helper = require('../db/helperFunctions.js');
+const helperFunctions = require('../db/helperFunctions.js');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
@@ -16,7 +16,7 @@ router.use(function(req, res, next) {
 });
 
 router.use(bodyParser.urlencoded());
-router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', 'newTeam', '/sign-s3', '/super/compare']}));
+// router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/']}));
 
 router.post('/newuser', function (req, res, next) {
   responseObject = {};
@@ -25,7 +25,7 @@ router.post('/newuser', function (req, res, next) {
       if (err) {
         console.log(err);
       } else {
-        var myToken = helper.generateToken(req.body.emailAddress, req.body.password);
+        var myToken = helperFunctions.generateToken(req.body.emailAddress, req.body.password);
         res.status(200).send(myToken);
       }
     });
@@ -33,9 +33,11 @@ router.post('/newuser', function (req, res, next) {
   if (req.body.file) {
     if (Array.isArray(req.body.file)) {
       console.log('if', req.body.file);
-      //run function that does cool shit with the array of team members!
+      req.body.file.forEach((teamMember) => {
+        helperFunctions.sendEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
+      })
     } else {
-      helper.processSpreadsheet(req.body.file);
+      helperFunctions.processSpreadsheet(req.body.file);
     }
   }
 });
@@ -54,7 +56,7 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          var myToken = helper.generateToken(submittedUsername, submittedPassword);
+          var myToken = helperFunctions.generateToken(submittedUsername, submittedPassword);
           res.status(200).json(myToken);
         } else {
           responseObject.success = false;
