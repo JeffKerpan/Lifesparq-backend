@@ -4,7 +4,7 @@ const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
-const helper = require('../db/helperFunctions.js');
+const helperFunctions = require('../db/helperFunctions.js');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 
@@ -15,7 +15,6 @@ router.use(function(req, res, next) {
 });
 
 router.post('/compare', function (req, res, next) {
-  console.log('anything at all');
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
   let responseObject = {};
