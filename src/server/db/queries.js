@@ -71,3 +71,25 @@ exports.getTeam = function(teamId, callback) {
     callback(err);
   })
 }
+
+exports.deleteUser = function(userId, callback) {
+  knex('users')
+  .where('users.id', userId)
+  .del()
+  .then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
+}
+
+exports.deleteCoach = function(userId, callback) {
+  knex('coaches')
+  .where('coaches.id', userId)
+  .del()
+  .then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
+}

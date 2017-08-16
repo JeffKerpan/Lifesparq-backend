@@ -15,7 +15,9 @@ router.use(function(req, res, next) {
   return next();
 });
 
-router.use(bodyParser.urlencoded());
+router.use(bodyParser.urlencoded({
+  extended: true
+}));
 // router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/']}));
 
 router.post('/newuser', function (req, res, next) {
@@ -34,7 +36,7 @@ router.post('/newuser', function (req, res, next) {
     if (Array.isArray(req.body.file)) {
       console.log('if', req.body.file);
       req.body.file.forEach((teamMember) => {
-        helperFunctions.sendEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
+        helperFunctions.sendSignupEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
       })
     } else {
       helperFunctions.processSpreadsheet(req.body.file);
@@ -102,6 +104,12 @@ router.get('/userInfo', function (req, res, next) {
       })
     }
   })
+})
+
+router.post('/feedback', function (req, res, next) {
+  helperFunctions.sendFeedback(req.body.message, req.body.firstName);
+
+  res.status(200).send('Feedback sent');
 })
 
 router.get('/sign-s3', (req, res) => {
