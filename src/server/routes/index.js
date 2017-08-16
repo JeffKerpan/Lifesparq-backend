@@ -79,6 +79,16 @@ router.post('/newTeam', function(req, res, next) {
   })
 })
 
+router.get('/wholeteam', function(req, res, next) {
+  queries.getTeam(1, function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.status(200).send(result);
+    }
+  })
+})
+
 router.get('/userInfo', function (req, res, next) {
   queries.getUser(req.body.emailAddress, function (err, result) {
     if (err) {

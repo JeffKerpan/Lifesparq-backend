@@ -61,6 +61,13 @@ exports.superUser = function(emailAddress, callback) {
   })
 }
 
-exports.getTeam = function(teamId) {
-  knex('')
+exports.getTeam = function(teamId, callback) {
+  knex('teams')
+  .join('users', 'users.teamId', '=', 'teams.id')
+  .where('teams.id', teamId)
+  .then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
 }
