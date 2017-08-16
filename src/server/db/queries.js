@@ -9,6 +9,7 @@ exports.getUser = function(emailAddress, callback) {
     if (!result.length) {
       knex('users')
       .select('firstName', 'lastName', 'emailAddress', 'password', 'profilePicture')
+      .join('teams', 'teams.id', '=', 'users.teamId')
       .where(`users.emailAddress`, emailAddress)
       .then(result => {
         callback(null, result);
@@ -58,4 +59,8 @@ exports.superUser = function(emailAddress, callback) {
   }).catch(err => {
     callback(err);
   })
+}
+
+exports.getTeam = function(teamId) {
+  knex('')
 }

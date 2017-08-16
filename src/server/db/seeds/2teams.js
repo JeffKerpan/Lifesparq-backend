@@ -3,8 +3,9 @@ exports.seed = function(knex, Promise) {
     .then(function () {
       return Promise.all([
         knex('teams').insert({
-          teamName: 'Patriots',
-          sport: 'Football'
+          id: 0,
+          teamName: 'null',
+          sport: 'null'
         }),
         knex('teams').insert({
           teamName: 'Jets',
