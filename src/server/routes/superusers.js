@@ -43,7 +43,6 @@ router.get('/sign-s3', expressJwt({secret: process.env.JWT_KEY}), (req, res) => 
   if (!req.user.admin) {
     res.status(403).send('Access Forbidden');
   }
-  console.log('stuff');
   const s3 = new aws.S3();
   const fileName = req.query['file-name'];
   const fileType = req.query['file-type'];

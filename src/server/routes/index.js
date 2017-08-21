@@ -34,7 +34,6 @@ router.post('/newuser', function (req, res, next) {
   });
   if (req.body.file) {
     if (Array.isArray(req.body.file)) {
-      console.log('if', req.body.file);
       req.body.file.forEach((teamMember) => {
         helperFunctions.sendSignupEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
       })

@@ -6,7 +6,6 @@ exports.getUser = function(emailAddress, callback) {
   .join('teams', 'teams.id', '=', 'users.teamId')
   .where(`users.emailAddress`, emailAddress)
   .then(result => {
-    console.log(result);
     callback(null, result);
   }).catch(err => {
     callback(err);
@@ -14,7 +13,6 @@ exports.getUser = function(emailAddress, callback) {
 }
 
 exports.getCoach = function(emailAddress, callback) {
-  console.log('something');
   knex('coaches')
   .select('firstName', 'lastName', 'emailAddress', 'teamName', 'password', 'profilePicture')
   .join('teams', 'teams.id', '=', `coaches.teamId`)
