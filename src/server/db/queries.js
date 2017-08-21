@@ -1,23 +1,28 @@
 const knex = require('./connection');
 
 exports.getUser = function(emailAddress, callback) {
+  knex('users')
+  .select('firstName', 'lastName', 'emailAddress', 'password', 'profilePicture')
+  .join('teams', 'teams.id', '=', 'users.teamId')
+  .where(`users.emailAddress`, emailAddress)
+  .then(result => {
+    console.log(result);
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
+}
+
+exports.getCoach = function(emailAddress, callback) {
+  console.log('something');
   knex('coaches')
   .select('firstName', 'lastName', 'emailAddress', 'teamName', 'password', 'profilePicture')
   .join('teams', 'teams.id', '=', `coaches.teamId`)
   .where(`coaches.emailAddress`, emailAddress)
   .then(result => {
-    if (!result.length) {
-      knex('users')
-      .select('firstName', 'lastName', 'emailAddress', 'password', 'profilePicture')
-      .join('teams', 'teams.id', '=', 'users.teamId')
-      .where(`users.emailAddress`, emailAddress)
-      .then(result => {
-        callback(null, result);
-      })
-    } else {
-      callback(null, result);
-    }
+    callback(null, result);
   }).catch(err => {
+    console.log(err);
     callback(err);
   })
 }
@@ -64,6 +69,7 @@ exports.superUser = function(emailAddress, callback) {
 exports.getTeam = function(teamId, callback) {
   knex('teams')
   .join('users', 'users.teamId', '=', 'teams.id')
+  .select('firstName', 'lastName', 'emailAddress', 'teamName', 'address', 'address2', 'city', 'state', 'birthday')
   .where('teams.id', teamId)
   .then(result => {
     callback(null, result);

@@ -18,7 +18,7 @@ router.use(function(req, res, next) {
 router.use(bodyParser.urlencoded({
   extended: true
 }));
-// router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/']}));
+router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare']}));
 
 router.post('/newuser', function (req, res, next) {
   responseObject = {};
@@ -47,18 +47,15 @@ router.post('/newuser', function (req, res, next) {
 router.post('/compare', function (req, res, next) {
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
-  let responseObject = {};
+  let responseObject;
   queries.getUser(submittedUsername, function (err, result) {
     if (err) {
-      res.json({
-        error: true,
-        message: 'Sorry, we didn\'t recognize that email address.'
-      });
+      console.log(err);
     } else {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          var myToken = helperFunctions.generateToken(submittedUsername, submittedPassword);
+          var myToken = helperFunctions.generateUserToken(submittedUsername);
           res.status(200).json(myToken);
         } else {
           responseObject.success = false;
@@ -81,27 +78,12 @@ router.post('/newTeam', function(req, res, next) {
   })
 })
 
-router.get('/wholeteam', function(req, res, next) {
-  queries.getTeam(1, function (err, result) {
+router.get('/userInfo', expressJwt({secret: process.env.JWT_KEY}), function (req, res, next) {
+  queries.getUser(req.user.emailAddress, function (err, result) {
     if (err) {
       console.log(err);
     } else {
-      res.status(200).send(result);
-    }
-  })
-})
-
-router.get('/userInfo', function (req, res, next) {
-  queries.getUser(req.body.emailAddress, function (err, result) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.status(200).json({
-        firstName: result.firstName,
-        lastName: result.lastName,
-        emailAddress: result.emailAddress,
-        profilePicture: result.profilePicture
-      })
+      res.status(200).send(result[0]);
     }
   })
 })
