@@ -28,7 +28,7 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          var myToken = helper.generateToken(submittedUsername, submittedPassword);
+          var myToken = helperFunctions.generateAdminToken(submittedUsername);
           res.status(200).send(myToken);
         } else {
           responseObject.success = false;
@@ -39,7 +39,11 @@ router.post('/compare', function (req, res, next) {
   });
 })
 
-router.get('/sign-s3', (req, res) => {
+router.get('/sign-s3', expressJwt({secret: process.env.JWT_KEY}), (req, res) => {
+  if (!req.user.admin) {
+    res.status(403).send('Access Forbidden');
+  }
+  console.log('stuff');
   const s3 = new aws.S3();
   const fileName = req.query['file-name'];
   const fileType = req.query['file-type'];
