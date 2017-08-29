@@ -14,7 +14,7 @@ exports.getUser = function(emailAddress, callback) {
 
 exports.getCoach = function(emailAddress, callback) {
   knex('coaches')
-  .select('firstName', 'lastName', 'emailAddress', 'teamName', 'password', 'profilePicture')
+  .select('firstName', 'lastName', 'emailAddress', 'teamName', 'password', 'profilePicture', 'teamId')
   .join('teams', 'teams.id', '=', `coaches.teamId`)
   .where(`coaches.emailAddress`, emailAddress)
   .then(result => {

@@ -4,7 +4,7 @@ const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
-const helperFunctions = require('../db/helperFunctions.js');
+const tokens = require('../db/helperFunctions/tokens.js');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
@@ -28,8 +28,10 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          var myToken = helperFunctions.generateCoachToken(submittedUsername);
-          res.status(200).json(myToken);
+          var myToken = tokens.generateCoachToken(submittedUsername, result[0].teamId);
+          res.status(200).json({
+            token: myToken
+          });
         } else {
           responseObject.success = false;
           res.send(responseObject);
@@ -41,7 +43,7 @@ router.post('/compare', function (req, res, next) {
 
 router.get('/wholeteam', expressJwt({secret: process.env.JWT_KEY}), function(req, res, next) {
   if (req.user.coach) {
-    queries.getTeam(1, function (err, result) {
+    queries.getTeam(req.user.teamId, function (err, result) {
       if (err) {
         console.log(err);
       } else {

@@ -4,7 +4,7 @@ const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
-const helperFunctions = require('../db/helperFunctions.js');
+const tokens = require('../db/helperFunctions/tokens.js');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 
@@ -17,7 +17,6 @@ router.use(function(req, res, next) {
 router.post('/compare', function (req, res, next) {
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
-  let responseObject = {};
   queries.superUser(submittedUsername, function (err, result) {
     if (err) {
       res.json({
@@ -28,11 +27,14 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          var myToken = helperFunctions.generateAdminToken(submittedUsername);
-          res.status(200).send(myToken);
+          var myToken = tokens.generateAdminToken(submittedUsername);
+          res.status(200).json({
+            token: myToken
+          });
         } else {
-          responseObject.success = false;
-          res.send(responseObject);
+          res.status(401).json({
+            message: 'Incorrect email address or password'
+          })
         }
       });
     }

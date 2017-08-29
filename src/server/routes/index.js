@@ -4,7 +4,10 @@ const queries = require('../db/queries.js');
 const bcrypt = require('bcrypt');
 const parse = require('csv-parse');
 const aws = require('aws-sdk');
-const helperFunctions = require('../db/helperFunctions.js');
+const tokens = require('../db/helperFunctions/tokens.js');
+const spreadsheets = require('../db/helperFunctions/spreadsheets.js');
+const sendgrid = require('../db/helperFunctions/sendgrid.js');
+const usda = require('../db/helperFunctions/usda.js');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
@@ -18,7 +21,33 @@ router.use(function(req, res, next) {
 router.use(bodyParser.urlencoded({
   extended: true
 }));
-router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare']}));
+router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo']}));
+
+router.get('/404', function (req, res) {
+  res.status(404).json({
+    message: 'Not Found'
+  });
+})
+
+router.post('/foodgroups', function (req, res, next) {
+  usda.getAllFoodGroups(function (result) {
+    {
+      res.status(200).send(result);
+    }
+  });
+})
+
+router.post('/searchinfoodgroup', function (req, res) {
+  usda.getFoodsWithinFoodGroup(function (result) {
+    res.status(200).send(result);
+  })
+})
+
+router.post('/detailedfoodinfo', function (req, res) {
+  usda.getDetailedFoodInfo(function (result) {
+    res.status(200).send(result);
+  })
+})
 
 router.post('/newuser', function (req, res, next) {
   responseObject = {};
@@ -27,18 +56,20 @@ router.post('/newuser', function (req, res, next) {
       if (err) {
         console.log(err);
       } else {
-        var myToken = helperFunctions.generateToken(req.body.emailAddress, req.body.password);
-        res.status(200).send(myToken);
+        var myToken = tokens.generateToken(req.body.emailAddress, req.body.password);
+        res.status(200).json({
+          token: myToken
+        });
       }
     });
   });
   if (req.body.file) {
     if (Array.isArray(req.body.file)) {
       req.body.file.forEach((teamMember) => {
-        helperFunctions.sendSignupEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
+        sendgrid.sendSignupEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
       })
     } else {
-      helperFunctions.processSpreadsheet(req.body.file);
+      spreadsheets.processSpreadsheet(req.body.file);
     }
   }
 });
@@ -46,7 +77,6 @@ router.post('/newuser', function (req, res, next) {
 router.post('/compare', function (req, res, next) {
   let submittedUsername = req.body.emailAddress;
   let submittedPassword = req.body.password;
-  let responseObject;
   queries.getUser(submittedUsername, function (err, result) {
     if (err) {
       console.log(err);
@@ -54,11 +84,14 @@ router.post('/compare', function (req, res, next) {
       let hash = result[0].password;
       bcrypt.compare(submittedPassword, hash, function(err, response) {
         if (response) {
-          var myToken = helperFunctions.generateUserToken(submittedUsername);
-          res.status(200).json(myToken);
+          var myToken = tokens.generateUserToken(submittedUsername);
+          res.status(200).json({
+            token: myToken
+          });
         } else {
-          responseObject.success = false;
-          res.send(responseObject);
+          res.status(404).json({
+            message: 'Incorrect user info.'
+          })
         }
       });
     }
@@ -82,13 +115,18 @@ router.get('/userInfo', expressJwt({secret: process.env.JWT_KEY}), function (req
     if (err) {
       console.log(err);
     } else {
-      res.status(200).send(result[0]);
+      res.status(200).json({
+        firstName: result[0].firstName,
+        lastName: result[0].lastName,
+        emailAddress: result[0].emailAddress,
+        profilePicture: result[0].profilePicture
+      });
     }
   })
 })
 
 router.post('/feedback', function (req, res, next) {
-  helperFunctions.sendFeedback(req.body.message, req.body.firstName);
+  sendgrid.sendFeedback(req.body.message, req.body.firstName);
 
   res.status(200).send('Feedback sent');
 })
