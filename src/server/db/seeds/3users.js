@@ -15,6 +15,7 @@ exports.seed = function(knex, Promise) {
           lastName: 'Colbert',
           emailAddress: 'stephen@colbert.com',
           password: '$2a$11$Q777YWV/2TBEF53DKBq9PO8luk3X2Pboa32SZRYqqJbc87xrP9i2y',
+          teamId: knex('teams').select('id').where('teamName', 'Bills'),
           profilePicture: 'https://s3.amazonaws.com/lifesparq-profile-pictures/Boulder+Creek.jpg'
         }),
         knex('users').insert({
