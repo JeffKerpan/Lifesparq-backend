@@ -14,14 +14,17 @@ const bodyParser = require('body-parser');
 
 router.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   return next();
 });
 
 router.use(bodyParser.urlencoded({
   extended: true
 }));
-router.use(expressJwt({ secret: process.env.JWT_KEY }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo']}));
+
+router.use(expressJwt({
+  secret: process.env.JWT_KEY
+   }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo']}));
 
 router.get('/404', function (req, res) {
   res.status(404).json({
@@ -126,7 +129,7 @@ router.get('/userInfo', expressJwt({secret: process.env.JWT_KEY}), function (req
 })
 
 router.post('/feedback', function (req, res, next) {
-  sendgrid.sendFeedback(req.body.feedback.message, req.body.feedback.name);
+  sendgrid.sendFeedback(req.body.message, req.body.name);
 
   res.status(200).send('Feedback sent');
 })
