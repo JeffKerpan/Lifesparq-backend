@@ -14,3 +14,5 @@ exports.generateCoachToken = function(emailAddress, teamId) {
   var myToken = jwt.sign({emailAddress: emailAddress, coach: true, teamId: teamId}, process.env.JWT_KEY);
   return myToken;
 }
+
+`Bearer ${response.data.token}`
