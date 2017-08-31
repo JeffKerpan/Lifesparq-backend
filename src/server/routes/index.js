@@ -126,7 +126,7 @@ router.get('/userInfo', expressJwt({secret: process.env.JWT_KEY}), function (req
 })
 
 router.post('/feedback', function (req, res, next) {
-  sendgrid.sendFeedback(req.body.message, req.body.firstName);
+  sendgrid.sendFeedback(req.body.feedback.message, req.body.feedback.name);
 
   res.status(200).send('Feedback sent');
 })
