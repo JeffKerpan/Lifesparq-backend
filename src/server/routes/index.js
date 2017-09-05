@@ -22,9 +22,8 @@ router.use(bodyParser.urlencoded({
   extended: true
 }));
 
-router.use(expressJwt({
-  secret: process.env.JWT_KEY
-   }).unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo']}));
+router.use(expressJwt({ secret: process.env.JWT_KEY })
+.unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo']}));
 
 router.get('/404', function (req, res) {
   res.status(404).json({
