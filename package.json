@@ -44,5 +44,17 @@
     "run-sequence": "^1.2.2",
     "tiny-lr": "^0.2.1"
   },
-  "name": "Lifesparq-backend"
+  "name": "lifesparq-backend",
+  "main": "gulpfile.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathanejbrown/Lifesparq-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nathanejbrown/Lifesparq-backend/issues"
+  },
+  "homepage": "https://github.com/nathanejbrown/Lifesparq-backend#readme",
+  "description": ""
 }
