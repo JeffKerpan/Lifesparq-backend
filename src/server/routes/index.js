@@ -121,6 +121,7 @@ router.get('/userInfo', expressJwt({secret: process.env.JWT_KEY}), function (req
         firstName: result[0].firstName,
         lastName: result[0].lastName,
         emailAddress: result[0].emailAddress,
+        teamName: result[0].teamName,
         profilePicture: result[0].profilePicture
       });
     }

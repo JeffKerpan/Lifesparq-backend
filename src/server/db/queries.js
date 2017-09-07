@@ -2,7 +2,7 @@ const knex = require('./connection');
 
 exports.getUser = function(emailAddress, callback) {
   knex('users')
-  .select('firstName', 'lastName', 'emailAddress', 'password', 'profilePicture')
+  .select('firstName', 'lastName', 'emailAddress', 'password', 'profilePicture', 'teamName')
   .join('teams', 'teams.id', '=', 'users.teamId')
   .where(`users.emailAddress`, emailAddress)
   .then(result => {

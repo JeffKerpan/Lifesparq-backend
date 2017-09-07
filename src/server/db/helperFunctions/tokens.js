@@ -5,8 +5,8 @@ exports.generateAdminToken = function(emailAddress) {
   return myToken;
 }
 
-exports.generateUserToken = function(emailAddress) {
-  var myToken = jwt.sign({emailAddress: emailAddress, user: true}, process.env.JWT_KEY);
+exports.generateUserToken = function(emailAddress, id) {
+  var myToken = jwt.sign({emailAddress: emailAddress, user: true, id: id}, process.env.JWT_KEY);
   return myToken;
 }
 
