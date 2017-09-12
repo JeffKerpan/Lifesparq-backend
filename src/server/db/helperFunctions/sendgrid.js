@@ -28,7 +28,7 @@ exports.sendSignupEmail = function(emailAddress, firstName, lastName, coachFirst
 exports.sendFeedback = function (message, firstName) {
   var fromEmail = new helper.Email('test@example.com');
   //toEmail will need to be the email we set up for feedback.
-  var toEmail = new helper.Email('dennis.nathan@gmail.com');
+  var toEmail = new helper.Email('ryanharings@hotmail.com');
   var subject = `Feedback from ${firstName}`;
   var content = new helper.Content('text/plain', `${firstName} has submitted feedback about Lifesparq:
 
