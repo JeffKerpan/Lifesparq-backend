@@ -12,11 +12,12 @@ const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 
-router.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  return next();
-});
+// I moved this into the main-config!!!!!!!
+// router.use(function(req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+//   return next();
+// });
 
 router.use(bodyParser.urlencoded({
   extended: true
@@ -132,6 +133,28 @@ router.post('/feedback', function (req, res, next) {
   sendgrid.sendFeedback(req.body.message, req.body.name);
 
   res.status(200).send('Feedback sent');
+})
+
+router.post('/payment', function (req, res, next) {
+  console.log(req.body);
+  var token = req.body.stripeToken;
+
+  stripe.charges.create({
+    amount: 50,
+    currency: 'usd',
+    description: 'test chargerererer',
+    source: token
+  }, function(err, charge) {
+    if (err) {
+      res.json({
+        error: true,
+        message: 'Payment was not accepted:' + err
+      });
+    } else {
+      console.log(charge);
+      res.send(charge);
+    }
+  })
 })
 
 router.get('/sign-s3', (req, res) => {
