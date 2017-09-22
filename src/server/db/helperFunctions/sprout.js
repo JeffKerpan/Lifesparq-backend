@@ -1,10 +1,10 @@
 const https = require('https');
 
-exports.getAllVideos = function (callback) {
+exports.getAllByPath = function (path, callback) {
   var options = {
   method: 'GET',
   host: 'api.sproutvideo.com',
-  path: '/v1/videos',
+  path: `/v1/${path}`,
   headers: {'SproutVideo-Api-Key': process.env.SPROUT_KEY}
 };
 
@@ -21,53 +21,6 @@ exports.getAllVideos = function (callback) {
 
 var req = https.request(options, innerCallback);
 req.end();
-}
-
-exports.getAllPlaylists = function (callback) {
-  var options = {
-  method: 'GET',
-  host: 'api.sproutvideo.com',
-  path: '/v1/playlists',
-  headers: {'SproutVideo-Api-Key': process.env.SPROUT_KEY}
-};
-
-  innerCallback = function(response) {
-    var str = '';
-    response.on('data', function (chunk) {
-      str += chunk;
-    });
-
-    response.on('end', function () {
-      callback(JSON.parse(str));
-    });
-  }
-
-var req = https.request(options, innerCallback);
-req.end();
-
-}
-
-exports.getAllTags = function (callback) {
-  var options = {
-    method: 'GET',
-    host: 'api.sproutvideo.com',
-    path: '/v1/tags',
-    headers: {'SproutVideo-Api-Key': process.env.SPROUT_KEY}
-  }
-
-  innerCallback = function(response) {
-    var str = '';
-    response.on('data', function (chunk) {
-      str += chunk;
-    });
-
-    response.on('end', function () {
-      callback(JSON.parse(str));
-    });
-  }
-  var req = https.request(options, innerCallback);
-  req.end();
-
 }
 
 exports.getAllVideosByTag = function (tag, callback) {

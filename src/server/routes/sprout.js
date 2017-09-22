@@ -14,19 +14,19 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 
 router.get('/allvideos', function (req, res) {
-  sprout.getAllVideos(function (result) {
+  sprout.getAllByPath('videos', function (result) {
     res.status(200).send(result);
   })
 })
 
 router.get('/allplaylists', function (req, res) {
-  sprout.getAllPlaylists(function (result) {
+  sprout.getAllByPath('playlists', function (result) {
     res.status(200).send(result);
   })
 })
 
 router.get('/alltags', function (req, res) {
-  sprout.getAllTags(function (result) {
+  sprout.getAllByPath('tags', function (result) {
     res.status(200).send(result);
   })
 })
