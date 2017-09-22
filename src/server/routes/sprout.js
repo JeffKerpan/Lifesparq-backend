@@ -32,7 +32,7 @@ router.get('/alltags', function (req, res) {
 })
 
 router.post('/videosbytag', function (req, res) {
-  sprout.getAllVideosByTag(req.body.tag, function (result) {
+  sprout.getAllByPath(`videos?tag_name=${req.body.tag}`, function (result) {
     res.status(200).send(result);
   })
 })
