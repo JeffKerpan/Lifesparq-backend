@@ -25,18 +25,12 @@ router.use(bodyParser.urlencoded({
 }));
 
 router.use(expressJwt({ secret: process.env.JWT_KEY })
-.unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo', '/testsprout']}));
+.unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo', '/sprout/allvideos', '/sprout/alltags', '/sprout/videosbytag', '/sprout/allplaylists']}));
 
 router.get('/404', function (req, res) {
   res.status(404).json({
     message: 'Not Found'
   });
-})
-
-router.get('/testsprout', function (req, res) {
-  sprout.getAllVideos(function (result) {
-    res.status(200).send(result);
-  })
 })
 
 router.post('/foodgroups', function (req, res, next) {
