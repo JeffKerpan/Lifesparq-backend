@@ -18,12 +18,15 @@ router.use(expressJwt({ secret: process.env.JWT_KEY })
 // , expressJwt({secret: process.env.JWT_KEY})
 router.post('/payment', function (req, res, next) {
   var token = req.body.stripeToken;
+  var total = req.body.total * 100;
+  console.log(total);
 
   stripe.charges.create({
-    amount: 5000,
+    amount: total,
     currency: 'usd',
     description: 'test chargerererer',
-    source: token.id
+    source: token.id,
+    receipt_email: 'ryanharings@hotmail.com'
   }, function(err, charge) {
     if (err) {
       res.json({
