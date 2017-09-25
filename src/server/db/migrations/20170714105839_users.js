@@ -13,6 +13,7 @@ exports.up = function(knex, Promise) {
     table.integer('teamId').references('id').inTable('teams').defaultTo(0);
     table.string('profilePicture').defaultTo('http://via.placeholder.com/250x250');
     table.string('coverPicture').defaultTo('http://via.placeholder.com/350x150');
+    table.string('viewedVideos');
   })
 };
 
