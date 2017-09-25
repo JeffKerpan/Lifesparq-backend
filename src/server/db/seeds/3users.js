@@ -24,7 +24,8 @@ exports.seed = function(knex, Promise) {
           emailAddress: 'ashton@kutcher.com',
           password: '$2a$11$RFO6RQedExqc4VyN.x6GbOnGRXen4ULufZ4zREnLB.DRgFiOrzdMG',
           teamId: knex('teams').select('id').where('teamName', 'Jets'),
-          profilePicture: 'https://s3.amazonaws.com/lifesparq-profile-pictures/galleryimage-1578242971-feb-7-2012-300x225.jpg'
+          profilePicture: 'https://s3.amazonaws.com/lifesparq-profile-pictures/galleryimage-1578242971-feb-7-2012-300x225.jpg',
+          viewedVideos: '709adabf1b16e7c5f8,7c9adabf1b16e9ccf4,7c9ad8bd151fe0c2f4',
         })
       ]);
     });
