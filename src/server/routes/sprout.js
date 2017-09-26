@@ -16,16 +16,16 @@ const bodyParser = require('body-parser');
 router.get('/allvideos', expressJwt({secret: process.env.JWT_KEY}), function (req, res) {
 
   sprout.getAllByPath('videos', function (result) {
-    var allVideos = result.videos;
-    allVideos.forEach((video) => {
-      if (allViewedVideos.indexOf(video.id) > -1) {
-        video.watched = true;
-      } else {
-        video.watched = false;
-      }
-    })
-    res.status(200).send(allVideos);
-  })
+    // var allVideos = result.videos;
+    // allVideos.forEach((video) => {
+    //   if (allViewedVideos.indexOf(video.id) > -1) {
+    //     video.watched = true;
+    //   } else {
+    //     video.watched = false;
+    //   }
+    // })
+    res.status(200).send(result);
+  }, req.body.emailAddress)
 })
 
 router.get('/allplaylists', function (req, res) {
