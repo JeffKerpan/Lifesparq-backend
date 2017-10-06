@@ -17,21 +17,26 @@ exports.getAllByPath = function (path, callback, emailAddress) {
 
     response.on('end', function () {
       if (emailAddress) {
-        var videos = JSON.parse(str).videos;
+        var data = JSON.parse(str);
 
         queries.getUser(emailAddress, function (err, result) {
           if (err) {
             console.log(err);
-          } else {
+          } else if (result[0].viewedVideos.length){
             var allViewedVideos = result[0].viewedVideos;
-            videos.forEach((video) => {
-              if (allViewedVideos.indexOf(video.id) > -1) {
-                video.watched = true;
-              } else {
-                video.watched = false;
-              }
+              data.videos.forEach((video) => {
+                if (allViewedVideos.indexOf(video.id) > -1) {
+                  video.watched = true;
+                } else {
+                  video.watched = false;
+                }
+              })
+              callback(data);
+          } else {
+            data.videos.forEach((video) => {
+              video.watched = false;
             })
-            callback(videos);
+            callback(JSON.parse(str));
           }
         })
       } else {
