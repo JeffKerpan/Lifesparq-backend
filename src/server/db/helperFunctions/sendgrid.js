@@ -1,11 +1,13 @@
 const helper = require('sendgrid').mail;
 
-exports.sendSignupEmail = function(emailAddress, firstName, lastName, coachFirst, coachLast) {
+exports.sendSignupEmail = function(emailAddress, firstName, lastName, coachFirst, coachLast, teamId) {
+  console.log('blah', teamId);
 
+  var signUpUrl = `http://localhost:9000/#/moreinfoteammember/${teamId}/${firstName}/${lastName}`
   var fromEmail = new helper.Email('test@example.com');
   var toEmail = new helper.Email(emailAddress);
   var subject = 'Complete Lifesparq registration';
-  var content = new helper.Content('text/plain', `Hi ${firstName} ${lastName}, your coach, ${coachFirst} ${coachLast}, recently signed you up for Lifesparq. Click here to complete your registration!`);
+  var content = new helper.Content('text/plain', `Hi ${firstName} ${lastName}, your coach, ${coachFirst} ${coachLast}, recently signed you up for Lifesparq. Click here to complete your registration! ${signUpUrl}`);
   var mail = new helper.Mail(fromEmail, subject, toEmail, content);
 
   var sg = require('sendgrid')(process.env.SENDGRID_ADMIN_TO_USER_KEY);

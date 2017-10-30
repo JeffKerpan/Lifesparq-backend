@@ -41,6 +41,14 @@ router.post('/compare', function (req, res, next) {
   });
 })
 
+router.post('/verify', expressJwt({secret: process.env.JWT_KEY}), function(req, res) {
+  if (req.user.admin) {
+    res.status(200).send(true);
+  } else {
+    res.status(403).send(false);
+  }
+})
+
 router.get('/sign-s3', expressJwt({secret: process.env.JWT_KEY}), (req, res) => {
   if (!req.user.admin) {
     res.status(403).send('Access Forbidden');

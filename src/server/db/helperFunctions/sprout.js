@@ -31,16 +31,16 @@ exports.getAllByPath = function (path, callback, emailAddress) {
                   video.watched = false;
                 }
               })
-              callback(data);
+              callback(null, data);
           } else {
             data.videos.forEach((video) => {
               video.watched = false;
             })
-            callback(JSON.parse(str));
+            callback(null, JSON.parse(str));
           }
         })
       } else {
-        callback(JSON.parse(str));
+        callback(null, JSON.parse(str));
       }
 
 

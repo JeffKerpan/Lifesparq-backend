@@ -12,6 +12,7 @@ const sprout = require('../db/helperFunctions/sprout.js');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 
 // I moved this into the main-config!!!!!!!
 // router.use(function(req, res, next) {
@@ -24,13 +25,26 @@ router.use(bodyParser.urlencoded({
   extended: true
 }));
 
+router.use(session({secret: 'mySecret', resave: false, saveUninitialized: false}));
+
 router.use(expressJwt({ secret: process.env.JWT_KEY })
-.unless({path: ['/compare', '/newuser', '/newTeam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo', '/sprout/allvideos', '/sprout/alltags', '/sprout/videosbytag', '/sprout/allplaylists']}));
+.unless({path: ['/compare', '/newuser', '/newteam', '/sign-s3', '/super/compare', '/mail/', '/coaches/compare', '/searchinfoodgroup', '/404', '/foodgroups', '/detailedfoodinfo', '/sprout/allvideos', '/sprout/alltags', '/sprout/videosbytag', '/sprout/allplaylists', '/cloudinary', '/cloudinary/image', '/teamname']}));
 
 router.get('/404', function (req, res) {
   res.status(404).json({
     message: 'Not Found'
   });
+})
+
+router.post('/teamname', function (req, res) {
+  var teamId = req.body.teamId;
+  queries.getTeamName(teamId, function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.status(200).send(result);
+    }
+  })
 })
 
 router.post('/foodgroups', function (req, res, next) {
@@ -56,11 +70,15 @@ router.post('/detailedfoodinfo', function (req, res) {
 router.post('/newuser', function (req, res, next) {
   responseObject = {};
   bcrypt.hash(req.body.password, 11, function (err, hash) {
-    queries.newUser(req.body.tableName, req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.teamId, req.body.profilePicture, function (err, result) {
+    queries.newUser(req.body.tableName, req.body.firstName, req.body.lastName, req.body.emailAddress, hash, req.body.teamId, req.body.profilePicture, req.body.birthday, function (err, result) {
       if (err) {
         console.log(err);
       } else {
-        var myToken = tokens.generateToken(req.body.emailAddress, req.body.password);
+        if (req.body.access === 'coach') {
+          var myToken = tokens.generateCoachToken(req.body.emailAddress, result[0]);
+        } else {
+          var myToken = tokens.generateUserToken(req.body.emailAddress, result[0])
+        }
         res.status(200).json({
           token: myToken
         });
@@ -70,7 +88,7 @@ router.post('/newuser', function (req, res, next) {
   if (req.body.file) {
     if (Array.isArray(req.body.file)) {
       req.body.file.forEach((teamMember) => {
-        sendgrid.sendSignupEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName);
+        sendgrid.sendSignupEmail(teamMember.emailAddress, teamMember.firstName, teamMember.lastName, req.body.firstName, req.body.lastName, req.body.teamId);
       })
     } else {
       spreadsheets.processSpreadsheet(req.body.file);
@@ -102,7 +120,7 @@ router.post('/compare', function (req, res, next) {
   });
 })
 
-router.post('/newTeam', function(req, res, next) {
+router.post('/newteam', function(req, res, next) {
   queries.newTeam(req.body.teamName, req.body.sport, function (err, result) {
     if (err) {
       console.log(err);

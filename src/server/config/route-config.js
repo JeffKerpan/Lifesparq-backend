@@ -10,6 +10,7 @@
     const coachRoutes = require('../routes/coaches');
     const paymentRoutes = require('../routes/payment');
     const sproutRoutes = require('../routes/sprout');
+    const cloudinaryRoutes = require('../routes/cloudinary')
 
     // *** register routes *** //
     app.use('/', routes);
@@ -17,6 +18,7 @@
     app.use('/coaches', coachRoutes);
     app.use('/payment', paymentRoutes);
     app.use('/sprout', sproutRoutes);
+    app.use('/cloudinary', cloudinaryRoutes);
   };
 
 })(module.exports);
