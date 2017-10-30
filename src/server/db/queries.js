@@ -39,15 +39,17 @@ exports.newTeam = function(teamName, sport, callback) {
   })
 }
 
-exports.newUser = function(tableName, firstName, lastName, emailAddress, password, teamId, profilePicture, callback) {
+exports.newUser = function(tableName, firstName, lastName, emailAddress, password, teamId, profilePicture, birthday, callback) {
   knex(tableName)
+  .returning('id')
   .insert({
     firstName: firstName,
     lastName: lastName,
     emailAddress: emailAddress,
     password: password,
     teamId: teamId,
-    profilePicture: profilePicture
+    profilePicture: profilePicture,
+    birthday: birthday
   })
   .then(result => {
     callback(null, result);
@@ -91,6 +93,39 @@ exports.deleteCoach = function(userId, callback) {
   knex('coaches')
   .where('coaches.id', userId)
   .del()
+  .then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
+}
+
+exports.addVideoWithDescription = function (videoId, description, callback) {
+  knex('videos_and_pdfs')
+  .insert({
+    videoId: videoId,
+    description: description
+  }).then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
+}
+
+exports.getAllDescriptions = function (callback) {
+  knex('videos_and_pdfs')
+  .select('*')
+  .then(result => {
+    callback(null, result);
+  }).catch(err => {
+    callback(err);
+  })
+}
+
+exports.getTeamName = function (teamId, callback) {
+  knex('teams')
+  .select('teamName')
+  .where('teams.id', teamId)
   .then(result => {
     callback(null, result);
   }).catch(err => {
